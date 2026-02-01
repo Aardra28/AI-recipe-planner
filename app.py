@@ -131,7 +131,8 @@ def load_image():
     """Load and display the header image"""
     try:
         # Use raw string (r"") or forward slashes for Windows paths
-        image_path = r"E:\OneDrive\vscode_practice\GEN-AI\MULTI-AGENT\download.jpg"
+        # image_path = r"E:\OneDrive\vscode_practice\GEN-AI\MULTI-AGENT\download.jpg"
+        image_path = "download.jpg"
         # Alternative: image_path = "E:/OneDrive/vscode_practice/GEN-AI/MULTI-AGENT/download.jpg"
         
         if os.path.exists(image_path):
