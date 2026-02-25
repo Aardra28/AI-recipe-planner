@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from groq import Groq
+from elevenlabs.client import ElevenLabs
 
 # Load environment variables from .env file
 load_dotenv()
@@ -53,6 +54,7 @@ def call_llm(system_prompt: str, user_input: str, agent_name: str = 'default') -
         {"role": "user", "content": user_input}
     ]
     
+    print('messages-test', messages)
     # Get max tokens for this agent, default to 3000 if not specified
     max_tokens = MAX_TOKENS.get(agent_name, 3000)
     
@@ -67,7 +69,62 @@ def call_llm(system_prompt: str, user_input: str, agent_name: str = 'default') -
     )
     
     response_text = completion.choices[0].message.content
+    print('test-call_llm- return', response_text)
     return response_text
+
+
+@st.cache_resource
+def get_elevenlabs_client():
+    """Initialize ElevenLabs client for speech-to-text"""
+    api_key = os.getenv("api_key")  # Make sure this matches your .env variable name
+    if not api_key:
+        st.error("⚠️ ElevenLabs API key not found. Please set 'api_key' in your .env file.")
+        return None
+    return ElevenLabs(api_key=api_key)
+
+
+def transcribe_audio(audio_file):
+    """
+    Transcribe audio file using ElevenLabs
+    
+    Args:
+        audio_file: Audio file from st.audio_input
+        
+    Returns:
+        Transcribed text or None if error
+    """
+    try:
+        elevenlabs = get_elevenlabs_client()
+        if elevenlabs is None:
+            st.error("❌ ElevenLabs client not initialized")
+            return None
+        
+        print(f"Audio file type: {type(audio_file)}")
+        print(f"Audio file: {audio_file}")
+        
+        # Reset file pointer to beginning
+        audio_file.seek(0)
+            
+        transcription = elevenlabs.speech_to_text.convert(
+            file=audio_file,
+            model_id="scribe_v2",
+        )
+        
+        print(f"Transcription result: {transcription}")
+        print(f"Transcription text: {transcription.text}")
+        
+        if transcription and transcription.text:
+            return transcription.text
+        else:
+            st.error("❌ No text returned from transcription")
+            return None
+            
+    except Exception as e:
+        st.error(f"❌ Transcription error: {str(e)}")
+        print(f"Full error: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
 
 # ============================================================================
@@ -123,6 +180,12 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #FF5252;
     }
+    /* Microphone button styling */
+    div[data-testid="column"]:last-child button {
+        font-size: 1.5rem;
+        height: 50px;
+        margin-top: 8px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -131,8 +194,7 @@ def load_image():
     """Load and display the header image"""
     try:
         # Use raw string (r"") or forward slashes for Windows paths
-        # image_path = r"E:\OneDrive\vscode_practice\GEN-AI\MULTI-AGENT\download.jpg"
-        image_path = "download.jpg"
+        image_path = r"E:\OneDrive\vscode_practice\GEN-AI\MULTI-AGENT\download.jpg"
         # Alternative: image_path = "E:/OneDrive/vscode_practice/GEN-AI/MULTI-AGENT/download.jpg"
         
         if os.path.exists(image_path):
@@ -144,7 +206,7 @@ def load_image():
     except Exception as e:
         st.warning(f"Could not load image: {str(e)}")
         return None
-
+    
 
 def run_multi_agent_pipeline(user_input: str):
     """
@@ -156,6 +218,7 @@ def run_multi_agent_pipeline(user_input: str):
     Returns:
         Dictionary containing all agent outputs and final result
     """
+    
     results = {
         'preferences': None,
         'recipes': None,
@@ -169,9 +232,16 @@ def run_multi_agent_pipeline(user_input: str):
     try:
         # Agent 1: Preference Analyzer
         with st.spinner("🔍 Agent 1: Analyzing your preferences..."):
+            print('-----------------------------------------------------------------')
+            print("")
+            print('test', user_input)
+            print('test', call_llm)
             results['preferences'] = analyze_preferences(user_input, call_llm)
             st.success("✅ Preferences analyzed successfully!")
-        
+            print('check- results', results)
+            print('check- results_preferences', results['preferences'])
+            
+            
         # Agent 2: Recipe Searcher
         with st.spinner("🔎 Agent 2: Searching for recipes..."):
             results['recipes'] = search_recipes(results['preferences'], call_llm)
@@ -183,7 +253,7 @@ def run_multi_agent_pipeline(user_input: str):
             st.success("✅ Recipe analysis completed!")
         
         # Agent 4: Meal Plan Composer
-        with st.spinner("📅 Agent 4: Composing your weekly meal plan..."):
+        with st.spinner("📅 Agent 4: Composing your meal plan..."):
             results['meal_plan'] = compose_meal_plan(results['recipe_analysis'], call_llm)
             st.success("✅ Meal plan created successfully!")
         
@@ -223,21 +293,53 @@ def main():
     
     # Title
     st.markdown('<p class="main-header">🍽️ AI Recipe Management System</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Your Personalized Weekly Meal Planner</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Your Personalized Meal Planner</p>', unsafe_allow_html=True)
     
     # Main content area
     st.markdown("---")
     
-    # User input
+    # User input section
     st.subheader("📝 Tell us about your meal preferences")
-    user_input = st.text_area(
-        "Describe your meal preferences:",
+    
+    # Initialize session state
+    if 'transcribed_text' not in st.session_state:
+        st.session_state.transcribed_text = ""
+    
+    # Text input area
+    typed_text = st.text_area(
+        "",
         height=150,
-        placeholder="Example: I want healthy meals for 2 people. Vegetarian. Love Italian and Indian food. Budget ₹5,000. Max 45 min cooking time.",
-        help="Include: number of people, dietary preferences, cuisines, allergies, budget, cooking time"
+        placeholder="Type your preferences here... OR use the microphone below",
+        key="typed_input",
+        label_visibility="collapsed"
     )
     
+    st.markdown("---")
+    
+    # Voice input
+    st.info("🎤 Or click the microphone and speak your preferences")
+    audio_file = st.audio_input("Record your voice")
+    
+    if audio_file is not None:
+        with st.spinner("🎧 Transcribing your voice..."):
+            transcribed = transcribe_audio(audio_file)
+            
+            if transcribed:
+                st.session_state.transcribed_text = transcribed
+                st.success("✅ Voice transcribed successfully!")
+    
+    # Determine which input to use
+    if st.session_state.transcribed_text:
+        st.markdown("### 📝 Your transcribed preferences:")
+        st.info(st.session_state.transcribed_text)
+        user_input = st.session_state.transcribed_text
+    elif typed_text.strip():
+        user_input = typed_text
+    else:
+        user_input = ""
+    
     # Generate button
+    st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         generate_button = st.button("🚀 Generate My Meal Plan", use_container_width=True)
@@ -245,7 +347,7 @@ def main():
     # Process when button is clicked
     if generate_button:
         if not user_input.strip():
-            st.warning("⚠️ Please enter your meal preferences before generating a plan.")
+            st.warning("⚠️ Please enter your meal preferences (type or speak) before generating a plan.")
         else:
             # Run the pipeline
             st.markdown("---")
@@ -299,7 +401,7 @@ def main():
                 
                 with tab5:
                     st.markdown('<div class="agent-section">', unsafe_allow_html=True)
-                    st.markdown("### Agent 4: Weekly Meal Plan")
+                    st.markdown("### Agent 4: Meal Plan")
                     st.markdown(results['meal_plan'])
                     st.markdown('</div>', unsafe_allow_html=True)
                 

@@ -37,7 +37,7 @@ Your task is to:
    - Stay within the cooking time limit
    - Match the cuisine preferences
 
-Critical point : make sure to always stick to what the user asked.
+Critical point : make sure to always stick to what the user asked and his preference.
 Be creative, diverse, and ensure all recipes strictly match the user's preferences and restrictions.
 Output ONLY the recipe list, nothing else."""
 
