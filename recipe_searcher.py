@@ -9,6 +9,9 @@ def search_recipes(preferences: str, call_llm) -> str:
     Returns:
         List of recipe titles with previews and sources
     """
+    
+    
+    print('preferences_agent_2',preferences)
     system_prompt = """You are a Recipe Searcher agent for a recipe management system.
 
 Your task is to:
@@ -34,36 +37,7 @@ Your task is to:
    - Stay within the cooking time limit
    - Match the cuisine preferences
 
-6. Output format:
-
-## RECIPE SEARCH RESULTS
-
-**Total Recipes Found:** [number]
-
----
-
-### 🍽️ Recipe 1: [Name]
-
-**Cuisine:** [type]  
-**Main Ingredients:** [list key ingredients]  
-**Cooking Time:** [time] minutes  
-**Difficulty:** [level]  
-**Description:** [brief description]
-
----
-
-### 🍽️ Recipe 2: [Name]
-
-**Cuisine:** [type]  
-**Main Ingredients:** [list key ingredients]  
-**Cooking Time:** [time] minutes  
-**Difficulty:** [level]  
-**Description:** [brief description]
-
----
-
-[Continue for all 8-12 recipes]
-
+Critical point : make sure to always stick to what the user asked.
 Be creative, diverse, and ensure all recipes strictly match the user's preferences and restrictions.
 Output ONLY the recipe list, nothing else."""
 

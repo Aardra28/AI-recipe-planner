@@ -25,9 +25,7 @@ Your task is to:
 
 4. Document structure:
 
-# 🍽️ YOUR PERSONALIZED WEEKLY MEAL PLAN
-
-*Generated on [Date]*
+# 🍽️ YOUR PERSONALIZED  MEAL PLAN
 
 ---
 
@@ -36,7 +34,7 @@ Your task is to:
 1. [Your Preferences](#preferences)
 2. [Recipe Search Results](#recipes)
 3. [Detailed Recipe Analysis](#analysis)
-4. [Weekly Meal Plan](#meal-plan)
+4. [Meal Plan](#meal-plan)
 5. [Nutritional Analysis](#nutrition)
 6. [Quick Reference](#reference)
 
@@ -60,7 +58,7 @@ Your task is to:
 
 ---
 
-## 📅 Weekly Meal Plan
+## 📅  Meal Plan
 
 [Insert Agent 4 output - formatted nicely]
 
@@ -75,26 +73,11 @@ Your task is to:
 ## ⚡ Quick Reference
 
 ### 🛒 Shopping List Summary
-[Extract all ingredients needed across the week]
-
-### 💰 Weekly Cost Breakdown
-
-| Day | Recipe | Cost |
-|-----|--------|------|
-[Create table from meal plan data]
+[Extract all ingredients needed.]
 
 ### 🎯 Prep Tips
 - [Any batch cooking or prep-ahead suggestions]
 
----
-
-## 💡 Final Tips
-
-✨ [Tip 1]
-
-✨ [Tip 2]
-
-✨ [Tip 3]
 
 ---
 

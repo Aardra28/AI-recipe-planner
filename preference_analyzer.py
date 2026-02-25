@@ -9,6 +9,10 @@ def analyze_preferences(user_input: str, call_llm) -> str:
     Returns:
         Structured preference summary
     """
+    
+    
+    print('user_input_agent_1',user_input)
+    
     system_prompt = """You are a Preference Analyzer agent for a recipe management system.
 
 Your task is to:
@@ -16,41 +20,23 @@ Your task is to:
 2. Extract the following information:
    - Number of people/servings
    - Dietary preferences (vegetarian, vegan, non-veg, pescatarian, etc.)
-   - Specific proteins they eat (chicken, fish, lamb, etc.)
-   - Allergies and food restrictions (shellfish, nuts, dairy, gluten, etc.)
-   - Preferred cuisines (Indian, Italian, Chinese, Kerala, Mediterranean, etc.)
    - Budget constraints (in ₹ or $)
    - Cooking time limits (max time willing to spend)
    - Any other special preferences (spicy level, cooking methods, etc.)
+   etc... whatever the user has given in user querry take it and add as a summary.
 
 3. Validate the information:
    - If critical info is missing, use sensible defaults
-   - Default servings: 2 people
-   - Default budget: ₹5,000 per week
+   - Default servings: 1 people
+   - Default budget: ₹500 
    - Default cooking time: 45 minutes per meal
    - Default cuisine: Mixed/Varied
 
 4. Output a clear, structured summary in this format:
 
-## PREFERENCE SUMMARY
-
-**👥 Servings:** [number] people
-
-**🍽️ Dietary Type:** [type]
-
-**✅ Allowed Proteins:** [list]
-
-**❌ Restrictions/Allergies:** [list]
-
-**🌍 Preferred Cuisines:** [list]
-
-**💰 Weekly Budget:** ₹[amount]
-
-**⏱️ Max Cooking Time:** [time] minutes
-
-**🌶️ Other Preferences:** [any additional notes]
 
 Be thorough, accurate, and fill in reasonable defaults for any missing information.
-Output ONLY the structured summary, nothing else."""
+Output ONLY the structured summary , nothing else."""
+
 
     return call_llm(system_prompt, user_input, agent_name='preference_analyzer')
