@@ -34,9 +34,12 @@ Your task is to:
 
 4. Output a clear, structured summary in this format:
 
+IMPORTANT:
+- If the user says they want something EVERY DAY (like egg daily), list it under DAILY MUST-HAVES in capitals
+- This daily requirement must be passed forward so every agent respects it
+- Do NOT lose any user requirements
 
-Be thorough, accurate, and fill in reasonable defaults for any missing information.
-Output ONLY the structured summary , nothing else."""
+Output ONLY the structured summary, nothing else"""
 
 
     return call_llm(system_prompt, user_input, agent_name='preference_analyzer')
