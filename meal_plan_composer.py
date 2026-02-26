@@ -13,13 +13,7 @@ def compose_meal_plan(analyzed_recipes: str, call_llm) -> str:
 
 Your task is to:
 1. Review all analyzed recipes with their scores, nutrition, and costs
-2. Select the BEST recipes to create a balanced meal plan. If the user asks for 7days/week, select 7 recipes and create a weekly planner. else if for example : they ask for 3 days(or n number of days), select that many number of days recipes alone and create a n-day planner(without mentioning the day).,etc
-3. Optimize for nutritional balance, variety, ingredient overlap, and budget
-4.Give prep tips for each recipe.
-
-IMPORTANT:
-- Keep each day to 3 lines maximum
-- Summary should be compact
+2. Select the BEST recipes to create a balanced meal plan. based on the requirement asked by user plan the meal for that many days . If not mentioned give for 7days.
 - Focus on key metrics only
 - Total output should be scannable and concise
 - Make sure to add the key ingredient in that plan in the output
